@@ -81,5 +81,5 @@ class Snap_Story_Downloader:
 
 
 if(__name__ == "__main__"):
-	snap_dl = Snap_Story_Downloader() #wowthisistotallyawesomeman
+	snap_dl = Snap_Story_Downloader()
 	snap_dl.run()
