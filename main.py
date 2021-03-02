@@ -50,12 +50,10 @@ class Snap_Story_Downloader:
 			self.download_files()
 
 	def has_no_mp4(self):
-		count = 0
 		for url in self.mp4_files:
 			if(".mp4" in url):
-				count += 1
-
-		return count == 0
+				return False
+		return True
 
 	def download_files(self):
 		print("Starting downloading stories ...")
