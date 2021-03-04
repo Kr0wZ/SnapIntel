@@ -50,10 +50,12 @@ class Snap_Story_Downloader:
 			self.download_files()
 
 	def has_no_mp4(self):
+		count = 0
 		for url in self.mp4_files:
 			if(".mp4" in url):
-				return False
-		return True
+				count += 1
+
+		return count == 0
 
 	def download_files(self):
 		print("Starting downloading stories ...")
@@ -68,8 +70,16 @@ class Snap_Story_Downloader:
 
 	def save_file(self, data, url):
 		filename = "/" + url.split("/")[-3] + ".mp4"
-		with open(self.output_dir + filename, 'wb') as file:
- 			file.write(data.content)
+		#Add FileNotFoundError exception and PermissionError
+		try:
+			with open(self.output_dir + filename, 'wb') as file:
+				file.write(data.content)
+		except FileNotFoundError:
+			print("Error can't find the specified folder")
+			exit(1)
+		except PermissionError:
+			print("Error can't access the specified folder. Check permissions or run this program with sudo rights")
+			exit(2)
 
 	def run(self):
 		self.build_opt_parser()
@@ -79,5 +89,5 @@ class Snap_Story_Downloader:
 
 
 if(__name__ == "__main__"):
-	snap_dl = Snap_Story_Downloader()
+	snap_dl = Snap_Story_Downloader() #wowthisistotallyawesomeman
 	snap_dl.run()
