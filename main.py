@@ -6,9 +6,10 @@ class Snap_Story_Downloader:
 	def __init__(self):
 		self.parser = None
 		self.username = ""
-		self.url = "https://story.snapchat.com/s/"
+		self.url = "https://www.snapchat.com/add/"
 		self.timeout = 30
-		self.url_regex = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+		self.url_regex = r'https://(bolt-gcdn\.sc-cdn\.net|cf-st\.sc-cdn\.net)/[^"]*uc=75'
+		self.url_regex2 = r'\.256\.'
 		self.mp4_files = list()
 		self.output_dir = "."
 
@@ -32,7 +33,7 @@ class Snap_Story_Downloader:
 			self.timeout = options.timeout
 
 	def update_url(self):
-		self.url = "https://story.snapchat.com/s/" + self.username
+		self.url = "https://www.snapchat.com/add/" + self.username
 
 	def make_request(self):
 		try:
@@ -42,34 +43,34 @@ class Snap_Story_Downloader:
 			print("Timeout reached")
 
 	def parse(self, response):
-		self.mp4_files = re.findall(self.url_regex, response)
-		if(self.has_no_mp4()):
+		self.mp4_files = list()
+		self.all_mp4_files = re.finditer(self.url_regex, response)
+
+		for match in self.all_mp4_files:
+			if not re.search(self.url_regex2, match.group(0)):
+				self.mp4_files.append(match.group(0))
+
+		if(len(self.mp4_files) == 0):
 			print("User doesn't exist or has no story")
 			return
 		else:
 			self.download_files()
 
-	def has_no_mp4(self):
-		count = 0
-		for url in self.mp4_files:
-			if(".mp4" in url):
-				count += 1
-
-		return count == 0
-
 	def download_files(self):
 		print("Starting downloading stories ...")
+		count = 0
 		for url in self.mp4_files:
-			if(url.split(".")[-1] == "mp4"):
-				try:
-					dl_url = requests.get(url, timeout=self.timeout)
-					self.save_file(dl_url, url)
-				except requests.exceptions.Timeout:
-					print("Timeout reached")
+			try:
+				dl_url = requests.get(url, timeout=self.timeout)
+				self.save_file(dl_url, url, count)
+			except requests.exceptions.Timeout:
+				print("Timeout reached")
+			count+=1
 		print("Stories saved in " + self.output_dir)
 
-	def save_file(self, data, url):
-		filename = "/" + url.split("/")[-3] + ".mp4"
+	def save_file(self, data, url, count):
+		filename = "/" + str(count) + "_" + url.split("/")[4].split(".")[0] + ".mp4"
+
 		#Add FileNotFoundError exception and PermissionError
 		try:
 			with open(self.output_dir + filename, 'wb') as file:
@@ -86,8 +87,6 @@ class Snap_Story_Downloader:
 		self.update_url()
 		self.make_request()
 
-
-
 if(__name__ == "__main__"):
-	snap_dl = Snap_Story_Downloader() #wowthisistotallyawesomeman
+	snap_dl = Snap_Story_Downloader()
 	snap_dl.run()
