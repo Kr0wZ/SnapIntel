@@ -26,6 +26,10 @@ Run the following command to install the dependencies:
 python3 -m pip install -r requirements.txt 
 ```
 
+⚠️ Known issue ⚠️
+If you have difficulties installing `numpy` try to downgrade your python3 version to `python3.8`
+
+
 ### Usage
 
 Simply run the tool using python3 without argument to show the help menu:
