@@ -6,3 +6,4 @@ numpy==1.21
 seaborn
 matplotlib
 hashlib
+heatmap
