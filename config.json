@@ -1,0 +1,37 @@
+{
+    "json_data_paths": {
+        "pageType": "props.pageProps.pageMetadata.pageType",
+        "pageTitle": "props.pageProps.pageMetadata.pageTitle",
+        "pageDescription": "props.pageProps.pageMetadata.pageDescription.value",
+        "username": "props.pageProps.userProfile.publicProfileInfo.username",
+        "profilePictureUrl": "props.pageProps.userProfile.publicProfileInfo.profilePictureUrl",
+        "badge": "props.pageProps.userProfile.publicProfileInfo.badge",
+        "squareHeroImageUrl": "props.pageProps.userProfile.publicProfileInfo.squareHeroImageUrl",
+        "subscriberCount": "props.pageProps.userProfile.publicProfileInfo.subscriberCount",
+        "profilePictureUrl": "props.pageProps.userProfile.publicProfileInfo.profilePictureUrl",
+        "bio": "props.pageProps.userProfile.publicProfileInfo.bio",
+        "websiteUrl": "props.pageProps.userProfile.publicProfileInfo.websiteUrl",
+        "snapcodeImageUrl": "props.pageProps.userProfile.publicProfileInfo.snapcodeImageUrl",
+
+        "private_username": "props.pageProps.userProfile.userInfo.username",
+        "displayName": "props.pageProps.userProfile.userInfo.displayName",
+        "avatarImageUrl": "props.pageProps.userProfile.userInfo.bitmoji3d.avatarImage.url",
+        "backgroundImageUrl": "props.pageProps.userProfile.userInfo.bitmoji3d.backgroundImage.url",
+        "private_snapcodeImageUrl": "props.pageProps.userProfile.userInfo.snapcodeImageUrl",
+
+        "hasCuratedHighlights": "props.pageProps.userProfile.publicProfileInfo.hasCuratedHighlights",
+        "hasSpotlightHighlights": "props.pageProps.userProfile.publicProfileInfo.hasSpotlightHighlights",
+
+        "story": "props.pageProps.story.snapList",
+        "curatedHighlights": "props.pageProps.curatedHighlights",
+        "spotlightHighlights": "props.pageProps.spotlightHighlights",
+
+        "spotlightName": "props.pageProps.spotlightStoryMetadata.{count}.videoMetadata.name",
+        "spotlightDuration": "props.pageProps.spotlightStoryMetadata.{count}.videoMetadata.durationMs",
+        "spotlightUploadDate": "props.pageProps.spotlightStoryMetadata.{count}.videoMetadata.uploadDateMs",
+        "spotlightEngagementStats": "props.pageProps.spotlightStoryMetadata.{count}.engagementStats.viewCount",
+        "spotlightHashtags": "props.pageProps.spotlightStoryMetadata.{count}.hashtags",
+
+        "lenses": "props.pageProps.lenses"
+    }
+}
