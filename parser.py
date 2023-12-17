@@ -33,7 +33,7 @@ class Parser:
 	def build_arg_parser(self):	
 		epilog = f"EXAMPLES:\nShow stats for a specific user:\n\tpython3 main.py -u <SNAP_USER> -s\n\nList all elements (account, stories, curated highlights, spotlights, lenses) for a specific user:\n\tpython3 main.py -u <SNAP_USER> -l a\n\nList stories, spotlights and generate a heatmap related to this data based on upload date:\n\tpython3 main.py -u <SNAP_USER> -l sp -m\n\nList stories, download everything (stories, curated highlights, spotlights, lenses) and store them to directory 'data':\n\tpython3 main.py -u <SNAP_USER> -l s -d a -o ./data"	
 		
-		self.parser = argparse.ArgumentParser(description="Snapchat Story Downloader - Made by KrowZ", epilog=epilog, argument_default=argparse.SUPPRESS, formatter_class=argparse.RawTextHelpFormatter)
+		self.parser = argparse.ArgumentParser(description="SnapIntel OSINT Tool - Made by KrowZ", epilog=epilog, argument_default=argparse.SUPPRESS, formatter_class=argparse.RawTextHelpFormatter)
 
 		self.parser.add_argument("-u", "--username", dest="username", type=str, help="Username of account we want to download stories from")
 		self.parser.add_argument("-s", "--stats", dest="stats", action="store_true", help="Only prints summary and statistics about the account")
