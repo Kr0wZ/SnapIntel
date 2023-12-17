@@ -1,3 +1,5 @@
+![SnapIntel Logo](https://github.com/Kr0wZ/SnapIntel/blob/master/assets/snapintel_logo.png?raw=true)
+
 # SnapIntel
 
 ### What is it?
