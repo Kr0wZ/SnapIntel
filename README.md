@@ -33,7 +33,7 @@ python3 main.py
 ```
 usage: main.py [-h] [-u USERNAME] [-s] [-l [OPTIONS]] [-m] [-d [OPTIONS]] [-o DIRECTORY] [-t TIMEOUT]
 
-Snapchat Story Downloader - Made by KrowZ
+SnapIntel OSINT Tool - Made by KrowZ
 
 optional arguments:
   -h, --help            show this help message and exit
