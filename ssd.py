@@ -3,13 +3,13 @@ import re
 import json
 import datetime
 import heatmap
-import parser
+import snap_parser
 import display
 import hashlib
 
 class Snap_Story_Downloader:
 	def __init__(self):
-		self.parser = parser.Parser()
+		self.parser = snap_parser.Parser()
 
 		self.url = "https://www.snapchat.com/add/"
 		self.url_regex = r'https://(bolt-gcdn\.sc-cdn\.net|cf-st\.sc-cdn\.net)/[^"]*uc=75'
