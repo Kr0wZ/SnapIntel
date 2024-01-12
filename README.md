@@ -15,9 +15,10 @@ The old tool (and its first version) was named **Snapchat_stories_dl** and was o
 
 ### Install
 
-Clone this repository:
+Clone this repository and jump in it:
 ```bash
 git clone https://github.com/Kr0wZ/SnapIntel/
+cd SnapIntel
 ```
 
 You must have `python3` installed on your machine.
