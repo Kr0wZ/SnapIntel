@@ -14,6 +14,7 @@ class Snap_Story_Downloader:
 		self.url = "https://www.snapchat.com/add/"
 		self.url_regex = r'https://(bolt-gcdn\.sc-cdn\.net|cf-st\.sc-cdn\.net)/[^"]*uc=75'
 		self.url_regex2 = r'\.256\.'
+		self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 		self.json_regex = r'<script[^>]+type="application/json"[^>]*>(.*?)</script>'
 		self.json_data = None
 		self.mp4_files = list()
@@ -32,7 +33,7 @@ class Snap_Story_Downloader:
 	#Perform the web request to snapchat
 	def make_request(self):
 		try:
-			response = requests.get(self.url, timeout=self.parser.timeout).text
+			response = requests.get(self.url, timeout=self.parser.timeout, headers=self.headers).text
 			self.get_info(response)
 		except requests.exceptions.Timeout:
 			print("Timeout reached")
@@ -74,7 +75,7 @@ class Snap_Story_Downloader:
 				final_url = '-'.join(['_'.join([base_url, str(i)]), end_url])
 
 				md5_hash = hashlib.md5()
-				response = requests.get(final_url, timeout=self.parser.timeout)
+				response = requests.get(final_url, timeout=self.parser.timeout, headers=self.headers)
 				
 				for data in response.iter_content(8192):
 					md5_hash.update(data)
@@ -371,7 +372,7 @@ class Snap_Story_Downloader:
 		total_length = 0
 		for url in self.mp4_files:
 			try:
-				response = requests.get(url, timeout=self.parser.timeout)
+				response = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
 				length = response.headers.get("content-length")
 
 				if(length != None):
@@ -391,7 +392,7 @@ class Snap_Story_Downloader:
 		count = 0
 		for url in self.mp4_files:
 			try:
-				dl_url = requests.get(url, timeout=self.parser.timeout)
+				dl_url = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
 				self.save_file(dl_url, url, count)
 			except requests.exceptions.Timeout:
 				print("Timeout reached")
