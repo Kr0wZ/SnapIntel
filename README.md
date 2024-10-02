@@ -5,7 +5,7 @@
 ### What is it?
 
 SnapIntel is a python tool providing you information about Snapchat users. You can list stories, curated highlights, spotlights, lenses and even download all of them!
-The heatmap functionality allows you tu generate a heatmap related to upload dates for specific categories.
+The heatmap functionality allows you to generate a heatmap related to upload dates for specific categories.
 
 ### Updates
 
