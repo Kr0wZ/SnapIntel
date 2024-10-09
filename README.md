@@ -84,7 +84,7 @@ List stories, download everything (stories, curated highlights, spotlights, lens
 
 ### Todo
 
-- Implement `watch` functionality (monitoring) to check a user every X minutes for new stories and download them if new already done.
+- Implement `watch` functionality (monitoring) to check a user every X minutes for new stories and download them if not already done.
 - Fix bugs?
 
 
