@@ -6,6 +6,7 @@ import heatmap
 import snap_parser
 import display
 import hashlib
+import concurrent.futures
 
 class Snap_Story_Downloader:
 	def __init__(self):
@@ -30,7 +31,7 @@ class Snap_Story_Downloader:
 	def update_url(self):
 		self.url = "https://www.snapchat.com/add/" + self.parser.username
 
-	#Perform the web request to snapchat
+	# Perform the web request to snapchat
 	def make_request(self):
 		try:
 			response = requests.get(self.url, timeout=self.parser.timeout, headers=self.headers).text
@@ -45,14 +46,14 @@ class Snap_Story_Downloader:
 
 		self.json_data_paths = config_data.get("json_data_paths", [])
 
-	#Returns the corresponding value given a path and a data
+	# Returns the corresponding value given a path and a data
 	def get_value(self, data_name, placeholders=None):
 		path = self.json_data_paths.get(data_name)
 		if path:
 			data = self.json_data
 			for key in path.split('.'):
-				#Check if there is a keyword in a path in JSON file (such as test.{count}.test). In this case, we replace the 
-				#keyword by the corresponding value from a variable in the code
+				# Check if there is a keyword in a path in JSON file (such as test.{count}.test). In this case, we replace the 
+				# keyword by the corresponding value from a variable in the code
 				match = re.match(r"{(.*?)}", key)
 				if(match):
 					data = data[placeholders]
@@ -60,35 +61,66 @@ class Snap_Story_Downloader:
 					data = data.get(key, {})
 		return data
 
-	#Not used for now because not optimized
-	#Returns a list of all bitmoji versions for a user
+
+	# Returns a list of all bitmoji versions for a user
 	def bitmojis(self, url) -> list:
-		result = list()
+		if(self.parser.list_bitmojis or self.parser.list_all or self.parser.download_bitmojis or self.parser.download_all):
+			result = set()  # Use a set to store unique md5 hashes
 
-		#Retrieve the max number
-		base_url = url.split("_")[0]
-		last_version = url.split("_")[1].split("-")[0]
-		end_url = '-'.join(url.split("-")[2:])
+			# Split the URL to get the base and end parts
+			base_url = url.split("_")[0]
+			last_version = url.split("_")[1].split("-")[0]
+			end_url = '-'.join(url.split("-")[4:])
 
-		for i in reversed(range(1, int(last_version)+1)):
-			try:
-				final_url = '-'.join(['_'.join([base_url, str(i)]), end_url])
+			# Use ThreadPoolExecutor to download and process bitmoji versions in parallel
+			with concurrent.futures.ThreadPoolExecutor(max_workers=self.parser.threads) as executor:
+				# Create a list of futures, one for each bitmoji version
+				futures = [
+					executor.submit(self.process_bitmoji_version, base_url, end_url, i)
+					for i in reversed(range(1, int(last_version) + 1))
+				]
 
-				md5_hash = hashlib.md5()
-				response = requests.get(final_url, timeout=self.parser.timeout, headers=self.headers)
-				
-				for data in response.iter_content(8192):
-					md5_hash.update(data)
+				# As futures complete, collect the results
+				for future in concurrent.futures.as_completed(futures):
+					md5_hash, content = future.result()
+					if md5_hash and md5_hash not in result:
+						result.add(md5_hash)
+						# Optional: Save content to a file
+						if(self.parser.download_bitmojis or self.parser.download_all):
+							try:
+								with open(self.parser.output_dir + f"{md5_hash}.webp", 'wb') as file:
+									file.write(content)
+							except FileNotFoundError:
+								print("Error can't find the specified folder")
+								exit(1)
+							except PermissionError:
+								print("Error can't access the specified folder. Check permissions or run this program with sudo rights")
+								exit(2)
 
-				if(md5_hash.hexdigest() not in result):
-					result.append(md5_hash.hexdigest())
-					#Save content into files
-					# with open(md5_hash.hexdigest(), 'wb') as file:
-					# 	file.write(response.content)
-			except requests.exceptions.Timeout:
-				print("Timeout reached")
+			if(self.parser.download_bitmojis or self.parser.download_all):
+				print(f"[+] All the {len(list(result))} bitmojis have been downloaded")
 
-		return result
+			return list(result)
+
+	# Function to process a single bitmoji version
+	def process_bitmoji_version(self, base_url, end_url, version):
+		try:
+			# Construct the final URL for the current version
+			final_url = '-'.join(['_'.join([base_url, str(version)]), end_url])
+
+			# Make the HTTP request to get the bitmoji
+			md5_hash = hashlib.md5()
+			response = requests.get(final_url, timeout=self.parser.timeout, headers=self.headers)
+
+			# Update the md5 hash with the response content
+			for data in response.iter_content(8192):
+				md5_hash.update(data)
+
+			# Return the md5 hash and content
+			return md5_hash.hexdigest(), response.content
+		except requests.exceptions.Timeout:
+			print(f"Timeout reached for version {version}")
+			return None, None
 
 	#When calling the print function, check for the third item. If true then get some info else, get other ones
 	def get_basic_information(self) -> list:
@@ -119,22 +151,22 @@ class Snap_Story_Downloader:
 			result.append(self.get_value("bio"))
 			result.append(self.get_value("websiteUrl"))
 			result.append(self.get_value("snapcodeImageUrl"))
-		#Not all private accounts have these pieces of information.
+		# Not all private accounts have these pieces of information.
 		else:
 			self.private_user = True
 			result.append(self.private_user)
 			result.append(self.get_value("private_username"))
 			result.append(self.get_value("displayName"))
 			result.append(self.get_value("avatarImageUrl"))
-			#Takes too much time for now
-			#result.append(self.bitmojis(self.get_value("avatarImageUrl")))
+			# Can't compute this for the stats option because it slows down the whole program only for that piece of information
+			result.append(self.get_value("avatarImageUrl"))
 			result.append(self.get_value("backgroundImageUrl"))
 			result.append(self.get_value("private_snapcodeImageUrl"))
 
 		return result
 
 	def get_stories(self) -> list:
-		#Story
+		# Story
 		result = list()
 
 		story = self.get_value("story")
@@ -322,6 +354,12 @@ class Snap_Story_Downloader:
 				#Create the heatmap and visualize it
 				self.heatmap.create_heatmap()
 		else:
+			self.display.print_bitmojis(basic_information)
+
+			if(self.parser.download_bool):
+				# This corresponds to the current bitmoji for the private user
+				self.bitmojis(basic_information[5])
+
 			print("\nUser is private, can't retrieve information about snaps")
 
 	def time_str_to_seconds(self, time_str):
@@ -382,22 +420,38 @@ class Snap_Story_Downloader:
 
 		print(f"Total size: {total_length/1000000:.2f} Mo")
 
-	#Downloads the stories and save eachof them in a separate file
+	#Downloads the stories and save each of them in a separate file
 	def download_files(self):
-		# print("Computing files size...")
-		# self.compute_files_size()
-
 		print("Starting downloading videos ...")
-		#Used to keep the order of uploads
-		count = 0
-		for url in self.mp4_files:
-			try:
-				dl_url = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
-				self.save_file(dl_url, url, count)
-			except requests.exceptions.Timeout:
-				print("Timeout reached")
-			count+=1
-		print("Videos saved in " + self.parser.output_dir)
+
+		# Use ThreadPoolExecutor to download files in parallel
+		with concurrent.futures.ThreadPoolExecutor(max_workers=self.parser.threads) as executor:
+			# Submit each download task to the executor
+			futures = [
+				executor.submit(self.download_and_save, url, count) 
+				for count, url in enumerate(self.mp4_files)
+			]
+
+			# Optionally, wait for all threads to complete and handle errors
+			for future in concurrent.futures.as_completed(futures):
+				try:
+					future.result()  # This will raise exceptions if they occurred in threads
+				except Exception as e:
+					print(f"Error occurred in a thread: {e}")
+
+		print(f"Videos saved in {self.parser.output_dir}")
+
+	def download_and_save(self, url, count):
+		try:
+			# Download the file from the URL
+			#print(f"Downloading file {count} from {url}")
+			dl_url = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
+			# Save the file
+			self.save_file(dl_url, url, count)
+		except requests.exceptions.Timeout:
+			print(f"Timeout reached for {url}")
+		except Exception as e:
+			print(f"Error downloading {url}: {e}")
 
 	#Save the data (mp4) to a file
 	def save_file(self, data, url, count):

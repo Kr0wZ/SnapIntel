@@ -30,8 +30,8 @@ class Display:
 					print(f"{Fore.GREEN}[+] Badge:{Style.RESET_ALL} Public Figure")
 				else:
 					print(f"{Fore.GREEN}[+] Badge:{Style.RESET_ALL} {Fore.RED}None{Style.RESET_ALL}")
-				print(f"{Fore.GREEN}[+] Profile Picture:{Style.RESET_ALL} {data[5]}")
-				print(f"{Fore.GREEN}[+] Background Picture:{Style.RESET_ALL} {data[6]}")
+				print(f"{Fore.GREEN}[+] Profile picture:{Style.RESET_ALL} {data[5]}")
+				print(f"{Fore.GREEN}[+] Background picture:{Style.RESET_ALL} {data[6]}")
 				print(f"{Fore.GREEN}[+] Subscriber count:{Style.RESET_ALL} {data[7]}")
 				print(f"{Fore.GREEN}[+] Bio:{Style.RESET_ALL} {data[8]}")
 				if(len(data[9]) != 0):
@@ -43,11 +43,9 @@ class Display:
 				print(f"{Fore.RED}[-] This is a private profile{Style.RESET_ALL}")
 				print(f"{Fore.GREEN}[+] Username:{Style.RESET_ALL} {data[3]}")
 				print(f"{Fore.GREEN}[+] Display name:{Style.RESET_ALL} {data[4]}")
-				print(f"{Fore.GREEN}[+] Avatar image:{Style.RESET_ALL} {data[5]}")
-				#Don't forget to change ID after removing comment
-				#print(f"{Fore.GREEN}[+] Bitmojis different versions:{Style.RESET_ALL} {len(data[6])}")
-				print(f"{Fore.GREEN}[+] Background image:{Style.RESET_ALL} {data[6]}")
-				print(f"{Fore.GREEN}[+] Snap code:{Style.RESET_ALL} {data[7]}")
+				print(f"{Fore.GREEN}[+] Avatar image (current bitmoji):{Style.RESET_ALL} {data[5]}")
+				print(f"{Fore.GREEN}[+] Background image:{Style.RESET_ALL} {data[7]}")
+				print(f"{Fore.GREEN}[+] Snap code:{Style.RESET_ALL} {data[8]}")
 
 	def print_stats(self, data):
 		if(self.parser.stats):
@@ -64,10 +62,14 @@ class Display:
 			print(f"\n{Fore.GREEN}[+] Number of stories:{Style.RESET_ALL} {data[0][0]}")
 			
 			#Curated highlights
-			print(f"\n{Fore.GREEN}[+] Number of curated highlight stories:{Style.RESET_ALL} {data[1][0]}")
-			total = 0
-			for story in data[1][1:]:
-				total += len(story[1:])
+
+			try:
+				print(f"\n{Fore.GREEN}[+] Number of curated highlight stories:{Style.RESET_ALL} {data[1][0]}")
+				total = 0
+				for story in data[1][1:]:
+					total += len(story[1:])
+			except:
+				total = 0
 			print(f"{Fore.GREEN}[+] Number of total snaps in curated highlights:{Style.RESET_ALL} {total}")
 
 			#Spotlights
@@ -115,6 +117,14 @@ class Display:
 
 	def print_curated_highlights(self, data):	
 		if(self.parser.list_highlights or self.parser.list_all):
+
+			try:
+				#Random test to trigger NoneType error
+				if(data[0] == "test"):
+					pass
+			except:
+				return
+
 			print(rf"""{Fore.YELLOW}
    _____                _           _   _    _ _       _     _ _       _     _       
   / ____|              | |         | | | |  | (_)     | |   | (_)     | |   | |      
@@ -208,3 +218,18 @@ class Display:
 				print(f"{Fore.GREEN}[+] Lense title:{Style.RESET_ALL} {lense[0]}")
 				print(f"\t{Style.BRIGHT}Is lense official?{Style.RESET_ALL} {lense[1]}")
 				print(f"\t{Style.BRIGHT}Preview video URL:{Style.RESET_ALL} {lense[2]}")
+
+
+	def print_bitmojis(self, data):
+		if(self.parser.list_bitmojis or self.parser.list_all):
+			print(rf"""{Fore.YELLOW}
+__________.__  __                     __.__        
+\______   \__|/  |_  _____   ____    |__|__| ______
+ |    |  _/  \   __\/     \ /  _ \   |  |  |/  ___/
+ |    |   \  ||  | |  Y Y  (  <_> )  |  |  |\___ \ 
+ |______  /__||__| |__|_|  /\____/\__|  |__/____  >
+        \/               \/      \______|       \/ 
+        {Style.RESET_ALL}""")
+
+			print(f"{Fore.GREEN}[+] Number of different bitmojis:{Style.RESET_ALL} {len(data[6])}")
+			print("If you want to download the bitmojis, take a look at the --download/-d option!")

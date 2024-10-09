@@ -9,6 +9,7 @@ class Parser:
 		self.username = ""
 		self.output_dir = "."
 		self.timeout = 30
+		self.threads = 10
 
 		self.list_all = False
 		self.list_user = False
@@ -16,6 +17,7 @@ class Parser:
 		self.list_highlights = False
 		self.list_spotlights = False
 		self.list_lenses = False
+		self.list_bitmojis = False
 
 		self.stats = False
 
@@ -28,6 +30,7 @@ class Parser:
 		self.download_highlights = False
 		self.download_spotlights = False
 		self.download_lenses = False
+		self.download_bitmojis = False
 
 
 	def build_arg_parser(self):	
@@ -37,18 +40,19 @@ class Parser:
 
 		self.parser.add_argument("-u", "--username", dest="username", type=str, help="Username of account we want to download stories from")
 		self.parser.add_argument("-s", "--stats", dest="stats", action="store_true", help="Only prints summary and statistics about the account")
-		self.parser.add_argument("-l", "--list", nargs="?", const="u", metavar='OPTIONS', help="List the desired information. By default, lists only user information. 'a' = all, 's' = stories, 'u' = user, 'c' = curated highlights, 'p' = spotlights, 'l' = lenses. Multiple options can be combined together: E.g: -l 'csl'")
+		self.parser.add_argument("-l", "--list", nargs="?", const="u", metavar='OPTIONS', help="List the desired information. By default, lists only user information. 'a' = all, 's' = stories, 'u' = user, 'c' = curated highlights, 'p' = spotlights, 'l' = lenses, 'b' = bitmojis. Multiple options can be combined together: E.g: -l 'csl'")
 		self.parser.add_argument("-m", "--heatmap", dest="heatmap", action="store_true", help="Generates a heatmap related to upload dates. Must be used with '-l/--list' option")
-		self.parser.add_argument("-d", "--download", nargs="?", const="s", metavar='OPTIONS', help="Downloads specific videos posted by a user. By default, only downloads current stories. 'a' = all, 's' = stories, 'c' = curated highlights, 'p' = spotlights, 'l' = lenses. Multiple options can be combined together: E.g: -d 'csl'")
+		self.parser.add_argument("-d", "--download", nargs="?", const="s", metavar='OPTIONS', help="Downloads specific videos posted by a user. By default, only downloads current stories. 'a' = all, 's' = stories, 'c' = curated highlights, 'p' = spotlights, 'l' = lenses, 'b' = bitmojis. Multiple options can be combined together: E.g: -d 'csl'")
 		self.parser.add_argument("-o", "--output", dest="output", type=str, metavar='DIRECTORY', help="Path where stories are stored. Default : current directory")
 		self.parser.add_argument("-t", "--timeout", dest="timeout", type=str, help="Requests timeout. Default : 30 seconds")
+		self.parser.add_argument("-T", "--threads", dest="threads", type=int, help="Number of concurrent threads. Default : 10")
 
 		self.args = self.parser.parse_args()
 
 		#It means the user specified the -l option but with nothing behind
 		if("list" in self.args):
 			for letter in self.args.list:
-				if(letter not in 'auscpl'):
+				if(letter not in 'auscplb'):
 					self.parser.error("You must specify a valid option for -l/--list")
 				if(letter == 'a'):
 					self.list_all = True
@@ -63,10 +67,12 @@ class Parser:
 						self.list_spotlights = True
 					if(letter == 'l'):
 						self.list_lenses = True
+					if(letter == 'b'):
+						self.list_bitmojis = True
 
 		if("download" in self.args):
 			for letter in self.args.download:
-				if(letter not in 'ascpl'):
+				if(letter not in 'ascplb'):
 					self.parser.error("You must specify a valid option for -d/--download")
 				if(letter == 'a'):
 					self.download_all = True
@@ -79,6 +85,8 @@ class Parser:
 						self.download_spotlights = True
 					if(letter == 'l'):
 						self.download_lenses = True
+					if(letter == 'b'):
+						self.download_bitmojis = True
 
 			#If any of download is required
 			self.download_bool = True
@@ -98,6 +106,8 @@ class Parser:
 			self.output_dir = self.args.output
 		if("timeout" in self.args):
 			self.timeout = self.args.timeout
+		if("threads" in self.args):
+			self.threads = self.args.threads
 		if("heatmap" in self.args):
 			self.opt_heatmap = True
 
