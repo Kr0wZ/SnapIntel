@@ -68,7 +68,7 @@ List stories, spotlights and generate a heatmap related to this data based on up
 	python3 main.py -u <SNAP_USER> -l sp -m
 
 List stories, download everything (stories, curated highlights, spotlights, lenses) and store them to directory 'data':
-	python3 main.py -u <SNAP_sUSER> -l s -d a -o ./data
+	python3 main.pyao sonia.papii> -l s -d a -o ./data
 ```
 
 
