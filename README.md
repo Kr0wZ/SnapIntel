@@ -59,7 +59,7 @@ optional arguments:
 
 EXAMPLES:
 Show stats for a specific user:
-	python3 main.py -u <SNAP_USER> -s
+	python3 main.py -u sonia.papii -s
 
 List all elements (account, stories, curated highlights, spotlights, lenses) for a specific user:
 	python3 main.py -u <SNAP_USER> -l a
