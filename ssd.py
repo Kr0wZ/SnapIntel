@@ -400,7 +400,7 @@ class Snap_Story_Downloader:
 		print("Videos saved in " + self.parser.output_dir)
 
 	#Save the data (mp4) to a file
-	def save_file(self, data, url, count):
+	def save_file(self, data, url,    count):
 		filename = "/" + str(count) + "_" + url.split("/")[4].split(".")[0] + ".mp4"
 		try:
 			with open(self.parser.output_dir + filename, 'wb') as file:
