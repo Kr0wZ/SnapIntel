@@ -2,7 +2,7 @@ requests
 argparse
 datetime
 pandas
-numpy==1.21
+numpy
 seaborn
 matplotlib
 colorama
