@@ -52,13 +52,16 @@ class Snap_Story_Downloader:
 		if path:
 			data = self.json_data
 			for key in path.split('.'):
-				# Check if there is a keyword in a path in JSON file (such as test.{count}.test). In this case, we replace the 
-				# keyword by the corresponding value from a variable in the code
-				match = re.match(r"{(.*?)}", key)
-				if(match):
-					data = data[placeholders]
-				else:
-					data = data.get(key, {})
+				try:
+					# Check if there is a keyword in a path in JSON file (such as test.{count}.test). In this case, we replace the 
+					# keyword by the corresponding value from a variable in the code
+					match = re.match(r"{(.*?)}", key)
+					if(match):
+						data = data[placeholders]
+					else:
+						data = data.get(key, {})
+				except AttributeError:
+					pass
 		return data
 
 
@@ -171,19 +174,23 @@ class Snap_Story_Downloader:
 
 		story = self.get_value("story")
 
-		result.append(len(story))
+		try:
+			result.append(len(story))
+			
+			for snap in story:
+				if(self.parser.download_stories or self.parser.download_all or self.parser.stats):
+					self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
+				if(self.parser.list_stories or self.parser.list_all):
+					snap_item = list()
+					snap_item.append(snap["snapIndex"])
+					snap_item.append(snap["snapUrls"]["mediaUrl"])
+					self.heatmap.fill_dates(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
+					snap_item.append(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
+					result.append(snap_item)
+		except TypeError:
+			result.append(0)
 
-		for snap in story:
-			if(self.parser.download_stories or self.parser.download_all or self.parser.stats):
-				self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
-			if(self.parser.list_stories or self.parser.list_all):
-				snap_item = list()
-				snap_item.append(snap["snapIndex"])
-				snap_item.append(snap["snapUrls"]["mediaUrl"])
-				self.heatmap.fill_dates(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
-				snap_item.append(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
-				result.append(snap_item)
-
+		
 		#print(result)
 		return result
 
