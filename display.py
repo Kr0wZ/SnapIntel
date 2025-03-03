@@ -89,8 +89,11 @@ class Display:
 			print(f"{Fore.GREEN}[+] Number of total snaps in spotlights:{Style.RESET_ALL} {total}")
 			print(f"{Fore.GREEN}[+] Total snaps' duration in spotlights:{Style.RESET_ALL} {self.ssd.time_str_list_to_seconds(time_strings)}")
 
-			if(data[2][-1] > 0):
-				print(f"{Fore.GREEN}[+] Total spotlights engagement stats:{Style.RESET_ALL} {data[2][-1]}")
+			try:
+				if(data[2][-1] > 0):
+					print(f"{Fore.GREEN}[+] Total spotlights engagement stats:{Style.RESET_ALL} {data[2][-1]}")
+			except:
+				pass
 
 			#Lenses
 			print(f"\n{Fore.GREEN}[+] Number of lenses:{Style.RESET_ALL} {data[3][0]}")
@@ -197,10 +200,13 @@ class Display:
 				print(f"\n{Fore.GREEN}[+] Total engagement stats:{Style.RESET_ALL} {data[-1]}")
 			print(f"{Fore.GREEN}[+] Total snaps' duration in spotlights:{Style.RESET_ALL} {self.ssd.time_str_list_to_seconds(time_strings)}")
 
-			if(len(data[-2][5]) > 0):
-				print(f"{Fore.GREEN}[+] Top 10 hashtags:{Style.RESET_ALL}")
-				for hashtag, count in data[-2][6]:
-					print(f"\t{hashtag}: {count} time(s)")
+			try:
+				if(len(data[-2][5]) > 0):
+					print(f"{Fore.GREEN}[+] Top 10 hashtags:{Style.RESET_ALL}")
+					for hashtag, count in data[-2][6]:
+						print(f"\t{hashtag}: {count} time(s)")
+			except TypeError:
+				pass
 
 	def print_lenses(self, data):
 		if(self.parser.list_lenses or self.parser.list_all):
