@@ -251,58 +251,61 @@ class Snap_Story_Downloader:
 			for spotlight_highlight in spotlight_highlights:
 
 				if(self.parser.list_spotlights or self.parser.list_all or self.parser.download_spotlights or self.parser.download_all or self.parser.stats):
-					spotlight_item = list()
-					spotlight_item.append(spotlight_highlight["thumbnailUrl"]["value"])
-					#Get metadata
-					#Pass the count variable as an argument to be able to convert it from the path to the actual value in the loop
-					spotlight_name = self.get_value("spotlightName", count)
-					spotlight_item.append(spotlight_name)
-					#Convert ms to minutes:seconds
-					minutes, seconds = self.ms_to_minutes_seconds(int(self.get_value("spotlightDuration", count)))
-					spotlight_item.append(f"{minutes}m{seconds}s")
+					try: 
+						spotlight_item = list()
+						spotlight_item.append(spotlight_highlight["thumbnailUrl"]["value"])
+						#Get metadata
+						#Pass the count variable as an argument to be able to convert it from the path to the actual value in the loop
+						spotlight_name = self.get_value("spotlightName", count)
+						spotlight_item.append(spotlight_name)
+						#Convert ms to minutes:seconds
+						minutes, seconds = self.ms_to_minutes_seconds(int(self.get_value("spotlightDuration", count)))
+						spotlight_item.append(f"{minutes}m{seconds}s")
 
-					spotlight_item.append(datetime.datetime.utcfromtimestamp(int(self.get_value("spotlightUploadDate", count))/1000).strftime("%Y-%m-%d %H:%M:%S"))
-					self.heatmap.fill_dates(datetime.datetime.utcfromtimestamp(int(self.get_value("spotlightUploadDate", count))/1000).strftime("%Y-%m-%d %H:%M:%S"))
+						spotlight_item.append(datetime.datetime.utcfromtimestamp(int(self.get_value("spotlightUploadDate", count))/1000).strftime("%Y-%m-%d %H:%M:%S"))
+						self.heatmap.fill_dates(datetime.datetime.utcfromtimestamp(int(self.get_value("spotlightUploadDate", count))/1000).strftime("%Y-%m-%d %H:%M:%S"))
 
-					engagement_stats = self.get_value("spotlightEngagementStats", count)
-					total_engagements += int(engagement_stats)
-					#Do not show information if negative because the data is not legitimate
-					if(total_engagements > -1):
-						spotlight_item.append(engagement_stats)
+						engagement_stats = self.get_value("spotlightEngagementStats", count)
+						total_engagements += int(engagement_stats)
+						#Do not show information if negative because the data is not legitimate
+						if(total_engagements > -1):
+							spotlight_item.append(engagement_stats)
 
-					hashtag_list = list()
-					#Count hashtag occurrences
-					for hashtag in self.get_value("spotlightHashtags", count):
-						#print(hashtag)
-						hashtag_list.append(hashtag)
-						if hashtag in hashtag_counts:
-							hashtag_counts[hashtag] += 1
-						else:
-							hashtag_counts[hashtag] = 1
+						hashtag_list = list()
+						#Count hashtag occurrences
+						for hashtag in self.get_value("spotlightHashtags", count):
+							#print(hashtag)
+							hashtag_list.append(hashtag)
+							if hashtag in hashtag_counts:
+								hashtag_counts[hashtag] += 1
+							else:
+								hashtag_counts[hashtag] = 1
 
-					spotlight_item.append(hashtag_list)
+						spotlight_item.append(hashtag_list)
 
-					#Get the top 10 hashtags
-					top_10_hashtags = sorted(hashtag_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+						#Get the top 10 hashtags
+						top_10_hashtags = sorted(hashtag_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
-					spotlight_item.append(top_10_hashtags)
-					stories = list()
-					for story in spotlight_highlight["snapList"]:
-						story_item = list()
+						spotlight_item.append(top_10_hashtags)
+						stories = list()
+						for story in spotlight_highlight["snapList"]:
+							story_item = list()
 
-						if(self.parser.download_spotlights or self.parser.download_all):
-							self.mp4_files.append(story["snapUrls"]["mediaUrl"])
+							if(self.parser.download_spotlights or self.parser.download_all):
+								self.mp4_files.append(story["snapUrls"]["mediaUrl"])
 
-						story_item.append(story["snapIndex"])
-						story_item.append(story["snapUrls"]["mediaUrl"])
+							story_item.append(story["snapIndex"])
+							story_item.append(story["snapUrls"]["mediaUrl"])
 
-						stories.append(story_item)
+							stories.append(story_item)
 
-					spotlight_item.append(stories)
+						spotlight_item.append(stories)
 
-					count += 1
+						count += 1
 
-					result.append(spotlight_item)
+						result.append(spotlight_item)
+					except TypeError:
+						pass
 
 			#Print the top 10 hashtags and their counts
 			# for hashtag, count in top_10_hashtags:
