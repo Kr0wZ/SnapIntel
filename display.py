@@ -226,7 +226,7 @@ class Display:
 				print(f"\t{Style.BRIGHT}Preview video URL:{Style.RESET_ALL} {lense[2]}")
 
 
-	def print_bitmojis(self, data):
+	def print_bitmojis(self, data, download):
 		if(self.parser.list_bitmojis or self.parser.list_all):
 			print(rf"""{Fore.YELLOW}
 __________.__  __                     __.__        
@@ -237,5 +237,9 @@ __________.__  __                     __.__
         \/               \/      \______|       \/ 
         {Style.RESET_ALL}""")
 
-			print(f"{Fore.GREEN}[+] Number of different bitmojis:{Style.RESET_ALL} {len(data[6])}")
-			print("If you want to download the bitmojis, take a look at the --download/-d option!")
+			try:
+				print(f"{Fore.GREEN}[+] Number of different bitmojis:{Style.RESET_ALL} {len(data)}")
+			except TypeError:
+				print(f"{Fore.GREEN}[+] Number of different bitmojis:{Style.RESET_ALL} 0")
+			if(not download):
+				print("If you want to download the bitmojis, take a look at the --download/-d option!")

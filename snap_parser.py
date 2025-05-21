@@ -104,6 +104,8 @@ class Parser:
 
 		if("output" in self.args):
 			self.output_dir = self.args.output
+			if(self.output_dir[-1] != '/'):
+				self.output_dir += "/"
 		if("timeout" in self.args):
 			self.timeout = self.args.timeout
 		if("threads" in self.args):

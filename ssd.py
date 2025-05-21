@@ -100,9 +100,6 @@ class Snap_Story_Downloader:
 								print("Error can't access the specified folder. Check permissions or run this program with sudo rights")
 								exit(2)
 
-			if(self.parser.download_bitmojis or self.parser.download_all):
-				print(f"[+] All the {len(list(result))} bitmojis have been downloaded")
-
 			return list(result)
 
 	# Function to process a single bitmoji version
@@ -133,7 +130,7 @@ class Snap_Story_Downloader:
 		page_type = self.get_value("pageType")
 		page_title = self.get_value("pageTitle")
 		
-		if(page_title == "Snapchat"):
+		if(not page_title):
 			print("User doesn't exist")
 			exit(1)
 
@@ -364,11 +361,12 @@ class Snap_Story_Downloader:
 				#Create the heatmap and visualize it
 				self.heatmap.create_heatmap()
 		else:
-			self.display.print_bitmojis(basic_information)
+			bitmojis_information = self.bitmojis(basic_information[5])
+			self.display.print_bitmojis(bitmojis_information, self.parser.download_bitmojis or self.parser.download_all)
 
-			if(self.parser.download_bool):
-				# This corresponds to the current bitmoji for the private user
-				self.bitmojis(basic_information[5])
+			if(self.parser.download_bitmojis or self.parser.download_all):
+				print(f"[+] All the {len(bitmojis_information)} bitmojis have been downloaded")
+				
 
 			print("\nUser is private, can't retrieve information about snaps")
 
