@@ -19,6 +19,7 @@ class Snap_Story_Downloader:
 		self.json_regex = r'<script[^>]+type="application/json"[^>]*>(.*?)</script>'
 		self.json_data = None
 		self.mp4_files = list()
+		self.jpg_files = list()
 		self.heatmap = heatmap.Snap_Heatmap()
 		self.json_data_paths = None
 		self.json_data = None
@@ -127,6 +128,9 @@ class Snap_Story_Downloader:
 		#Get basic information
 		result = list()
 
+		# DEBUG
+		print(self.json_data)
+
 		page_type = self.get_value("pageType")
 		page_title = self.get_value("pageTitle")
 		
@@ -176,7 +180,10 @@ class Snap_Story_Downloader:
 			
 			for snap in story:
 				if(self.parser.download_stories or self.parser.download_all or self.parser.stats):
-					self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
+					if(snap["snapMediaType"] == 0):
+						self.jpg_files.append(snap["snapUrls"]["mediaUrl"])
+					else:
+						self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
 				if(self.parser.list_stories or self.parser.list_all):
 					snap_item = list()
 					snap_item.append(snap["snapIndex"])
@@ -209,7 +216,10 @@ class Snap_Story_Downloader:
 					#Retrieve the same data as for basic snap stories
 					for story in snap["snapList"]:
 						if(self.parser.download_highlights or self.parser.download_all):
-							self.mp4_files.append(story["snapUrls"]["mediaUrl"])
+							if(snap["snapMediaType"] == 0):
+								self.jpg_files.append(snap["snapUrls"]["mediaUrl"])
+							else:
+								self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
 						story_item = list()
 						story_item.append(story["snapIndex"])
 						story_item.append(story["snapUrls"]["mediaUrl"])
@@ -289,7 +299,10 @@ class Snap_Story_Downloader:
 							story_item = list()
 
 							if(self.parser.download_spotlights or self.parser.download_all):
-								self.mp4_files.append(story["snapUrls"]["mediaUrl"])
+								if(snap["snapMediaType"] == 0):
+									self.jpg_files.append(snap["snapUrls"]["mediaUrl"])
+								else:
+									self.mp4_files.append(snap["snapUrls"]["mediaUrl"])
 
 							story_item.append(story["snapIndex"])
 							story_item.append(story["snapUrls"]["mediaUrl"])
@@ -414,19 +427,19 @@ class Snap_Story_Downloader:
 		return None
 
 	#Takes too much time for now
-	def compute_files_size(self):
-		total_length = 0
-		for url in self.mp4_files:
-			try:
-				response = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
-				length = response.headers.get("content-length")
+	#def compute_files_size(self):
+	#	total_length = 0
+	#	for url in self.mp4_files:
+	#		try:
+	#			response = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
+	#			length = response.headers.get("content-length")
 
-				if(length != None):
-					total_length += int(length)
-			except requests.exceptions.Timeout:
-				print("Timeout reached")
+	#			if(length != None):
+	#				total_length += int(length)
+	#		except requests.exceptions.Timeout:
+	#			print("Timeout reached")
 
-		print(f"Total size: {total_length/1000000:.2f} Mo")
+	#	print(f"Total size: {total_length/1000000:.2f} Mo")
 
 	#Downloads the stories and save each of them in a separate file
 	def download_files(self):
@@ -435,10 +448,12 @@ class Snap_Story_Downloader:
 		# Use ThreadPoolExecutor to download files in parallel
 		with concurrent.futures.ThreadPoolExecutor(max_workers=self.parser.threads) as executor:
 			# Submit each download task to the executor
-			futures = [
-				executor.submit(self.download_and_save, url, count) 
-				for count, url in enumerate(self.mp4_files)
-			]
+			futures = []
+
+			for count, url in enumerate(self.mp4_files):
+				futures.append(executor.submit(self.download_and_save, url, count, "mp4"))
+			for count, url in enumerate(self.jpg_files):
+				futures.append(executor.submit(self.download_and_save, url, count, "jpg"))
 
 			# Optionally, wait for all threads to complete and handle errors
 			for future in concurrent.futures.as_completed(futures):
@@ -449,21 +464,21 @@ class Snap_Story_Downloader:
 
 		print(f"Videos saved in {self.parser.output_dir}")
 
-	def download_and_save(self, url, count):
+	def download_and_save(self, url, count, ext):
 		try:
 			# Download the file from the URL
 			#print(f"Downloading file {count} from {url}")
 			dl_url = requests.get(url, timeout=self.parser.timeout, headers=self.headers)
 			# Save the file
-			self.save_file(dl_url, url, count)
+			self.save_file(dl_url, url, count, ext)
 		except requests.exceptions.Timeout:
 			print(f"Timeout reached for {url}")
 		except Exception as e:
 			print(f"Error downloading {url}: {e}")
 
 	#Save the data (mp4) to a file
-	def save_file(self, data, url, count):
-		filename = "/" + str(count) + "_" + url.split("/")[4].split(".")[0] + ".mp4"
+	def save_file(self, data, url, count, ext):
+		filename = "/" + str(count) + "_" + url.split("/")[4].split(".")[0] + "." + ext
 		try:
 			with open(self.parser.output_dir + filename, 'wb') as file:
 				file.write(data.content)
