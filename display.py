@@ -111,10 +111,13 @@ class Display:
 				{Style.RESET_ALL}""")
 
 			print(f"{Fore.GREEN}[+] Number of stories: {data[0]}")
+			EXTS = ["Image (JPG)", "Video (MP4)"]
+
 			for snap in data[1:]:
 				print(f"{Fore.GREEN}[+] ID:{Style.RESET_ALL} {Fore.YELLOW}{snap[0]}{Style.RESET_ALL}")
 				print(f"\t{Fore.GREEN}[+] URL:{Style.RESET_ALL} {snap[1]}")
-				print(f"\t{Fore.GREEN}[+] Upload date:{Style.RESET_ALL} {snap[2]}\n")
+				print(f"\t{Fore.GREEN}[+] Upload date:{Style.RESET_ALL} {snap[2]}")
+				print(f"\t{Fore.GREEN}[+] File type:{Style.RESET_ALL} {EXTS[snap[3]]}\n")
 
 
 

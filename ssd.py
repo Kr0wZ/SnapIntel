@@ -128,9 +128,6 @@ class Snap_Story_Downloader:
 		#Get basic information
 		result = list()
 
-		# DEBUG
-		print(self.json_data)
-
 		page_type = self.get_value("pageType")
 		page_title = self.get_value("pageTitle")
 		
@@ -190,6 +187,7 @@ class Snap_Story_Downloader:
 					snap_item.append(snap["snapUrls"]["mediaUrl"])
 					self.heatmap.fill_dates(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
 					snap_item.append(datetime.datetime.utcfromtimestamp(int(snap["timestampInSec"]["value"])).strftime("%Y-%m-%d %H:%M:%S"))
+					snap_item.append(snap["snapMediaType"])
 					result.append(snap_item)
 		except TypeError:
 			result.append(0)
@@ -443,7 +441,16 @@ class Snap_Story_Downloader:
 
 	#Downloads the stories and save each of them in a separate file
 	def download_files(self):
-		print("Starting downloading videos ...")
+		message = "stories, highlights, spotlights and lenses"
+
+		if(self.parser.download_stories):
+			message = "stories"
+		elif(self.parser.download_highlights):
+			message = "highlights"
+		elif(self.parser.download_spotlights):
+			message = "spotlights"
+
+		print(f"Starting downloading {message} ...")
 
 		# Use ThreadPoolExecutor to download files in parallel
 		with concurrent.futures.ThreadPoolExecutor(max_workers=self.parser.threads) as executor:
@@ -462,7 +469,7 @@ class Snap_Story_Downloader:
 				except Exception as e:
 					print(f"Error occurred in a thread: {e}")
 
-		print(f"Videos saved in {self.parser.output_dir}")
+		print(f"All {message} saved in {self.parser.output_dir}")
 
 	def download_and_save(self, url, count, ext):
 		try:
