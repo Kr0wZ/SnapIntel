@@ -9,6 +9,9 @@ The heatmap functionality allows you to generate a heatmap related to upload dat
 
 ### Updates
 
+`05/08/2025`:
+- You can now install **SnapIntel** to use it across your system with: `pip install .` once inside the main directory.
+
 `09/10/2024`:
 - Multi-threading has been implemented in the code for faster download (stories and bitmojis, see below)!
 - A new option `-T/--threads` can now be used to specify the numbers of concurrent threads you wan to run (10 by default if not specified).
@@ -29,7 +32,14 @@ cd SnapIntel
 ```
 
 You must have `python3` installed on your machine.
-Run the following command to install the dependencies:
+You can run this command to install `SnapIntel` and then use it from anywhere on your system:
+```bash
+pip install .
+
+# Now you can use "snapintel" as a command
+```
+
+Or run the following command to install the dependencies:
 ```bash
 python3 -m pip install -r requirements.txt 
 ```
@@ -41,7 +51,11 @@ If you have difficulties installing `numpy` try to downgrade your python3 versio
 ### Usage
 
 Simply run the tool using python3 with `-h/--help` to show the help menu:
-```python3
+```bash
+snapintel -h
+
+#OR
+
 python3 main.py -h
 ```
 ```
